@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Recognition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        .logo {
+            width: 250px;
+            height: auto;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .image-box {
+            margin: 0 10px;
+        }
+        .image-box img {
+            width: 640px;
+            height: 480px;
+        }
+        #gesture-info {
+            font-size: 40px; /* 글자 크기를 더 크게 설정 */
+            margin-top: 10px;
+            text-align: center;
+        }
+        .gesture-action {
+            color: blue; /* 바뀌는 부분의 색상을 파란색으로 설정 */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='AISL_Logo.jpg') }}" alt="AISL Logo" class="logo">
+    </div>
+    <div class="image-container">
+        <div class="image-box">
+            <h2>Robot-view</h2>
+            <img id="ros-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ROS Image">
+        </div>
+        <div class="image-box">
+            <h2>Webcam</h2>
+            <img id="gesture-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Gesture Image">
+        </div>
+    </div>
+    <div id="gesture-info">Waiting for gesture...</div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+
+        socket.on('image_update', function(data) {
+            document.getElementById('gesture-image').src = 'data:image/jpeg;base64,' + data.webcam_image;
+            var gestureInfoElement = document.getElementById('gesture-info');
+            gestureInfoElement.innerHTML = 'Action: <span class="gesture-action">' + data.gesture + '</span>';
+        });
+
+        socket.on('ros_image', function(data) {
+            document.getElementById('ros-image').src = 'data:image/jpeg;base64,' + data.ros_image;
+        });
+
+        socket.on('error', function(error) {
+            console.error('Socket error:', error);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gesture Recognition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;  /* 왼쪽 정렬 */
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        .logo {
+            width: 250px;  /* 로고 크기를 250px로 설정 */
+            height: auto;
+        }
+        #gesture-image {
+            display: block;
+            margin: 20px auto;
+        }
+        #gesture-info {
+            font-size: 18px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        
+        socket.on('image_update', function(data) {
+            var img = document.getElementById('gesture-image');
+            img.src = 'data:image/jpeg;base64,' + data.image;
+            document.getElementById('gesture-info').innerHTML = 'Action: ' + data.gesture;
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='AISL_Logo.jpg') }}" alt="AISL Logo" class="logo">
+    </div>
+    <img id="gesture-image" src="" width="640" height="480">
+    <div id="gesture-info">Waiting for gesture...</div>
+</body>
+</html>
